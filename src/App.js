@@ -7,6 +7,7 @@ import MatchingSystem from './pages/Matching';
 import Resources from './pages/Resources';
 import UserProfile from './pages/UserProfile';
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.css';
 
 // note React requires that the first letter of components are capitalized - otherwise WILL cause errors
 
