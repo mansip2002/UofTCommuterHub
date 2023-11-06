@@ -1,6 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from flask_cors import CORS
+import psycopg
+from dotenv import load_dotenv, dotenv_values
+
+load_dotenv()
+
+env = dotenv_values()
 
 app = Flask(__name__)
 CORS(app)
@@ -12,6 +18,13 @@ app.config['MAIL_USERNAME'] = 'uoftcommuterhub@gmail.com'
 app.config['MAIL_PASSWORD'] = 'opwx fjsf bxto oqpq'
 
 mail = Mail(app)
+
+db = psycopg.connect(
+    dbname=env["DB_NAME"], 
+    host=env["DB_HOST"],
+    user=env["DB_USER"],
+    password=env["DB_PASSWORD"]
+)
 
 import secrets
 def generate_verification_code():
@@ -57,6 +70,25 @@ def verify_email():
         return jsonify({'message': 'Email verified successfully!'})
     else:
         return jsonify({'message': 'Invalid verification code.'}), 400
+
+@app.route('/accounts', methods=['GET'])
+def test():
+    cur = db.cursor()
+    cur.execute("SELECT * FROM account;")
+
+    users = []
+    rows = cur.fetchall()
+
+    for row in rows:
+        users.append({
+            "id": row[0],
+            "first_name": row[1],
+            "last_name": row[2],
+            "email": row[3],
+            "password_hash": row[4]
+        })
+
+    return jsonify(users)
 
 if __name__ == '__main__':
     app.run(debug=True)
