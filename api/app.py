@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_mail import Mail, Message
 from flask_cors import CORS
 import psycopg
@@ -67,9 +67,52 @@ def verify_email():
 
     if email in users and users[email]['verification_code'] == code:
         users[email]['verified'] = True
+        session[email] = email
         return jsonify({'message': 'Email verified successfully!'})
     else:
         return jsonify({'message': 'Invalid verification code.'}), 400
+    
+@app.route('/user_profile', methods=['POST'])
+def submit_user_profile():
+    data = request.get_json()
+
+    cur = db.cursor()
+
+    # email = session.get("email")
+    email = "50000"
+
+    # Retrieve user_id from the account table based on the email
+    cur.execute("SELECT id FROM account WHERE email = %s", (email,))
+    result = cur.fetchone()
+
+    if not result:
+        return jsonify({"error": "User not found"}), 404
+
+    user_id = result[0]
+
+    for commuting_time in data["commutingTimes"]:
+        start_location = data["startLocation"]
+        end_location = data["endLocation"]
+        start_time = commuting_time["start"]
+        end_time = commuting_time.get("end", None)  # Use get to handle potential missing "end" key
+
+        # Insert entry with start time
+        cur.execute(
+            "INSERT INTO user_profile (user_id, name, start_location, end_location, day_of_week, start_time) VALUES (%s, %s, %s, %s, %s, %s)",
+            (user_id, data["name"], start_location, end_location, commuting_time["day"], start_time)
+        )
+
+        # Check if end time is provided and not an empty string
+        if end_time is not None and end_time != "":
+            # Insert entry with end time (locations reversed)
+            cur.execute(
+                "INSERT INTO user_profile (user_id, name, start_location, end_location, day_of_week, start_time) VALUES (%s, %s, %s, %s, %s, %s)",
+                (user_id, data["name"], end_location, start_location, commuting_time["day"], end_time)
+            )
+
+    db.commit()
+    return jsonify({"message": "Data submitted successfully"})
+
 
 @app.route('/accounts', methods=['GET'])
 def test():
