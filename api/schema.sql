@@ -1,8 +1,12 @@
 CREATE TABLE account (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    email VARCHAR(255),
-    password_hash VARCHAR(255)
-)
+    email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT NOW(),
+    verification_code VARCHAR(255) NOT NULL,
+    verified BOOLEAN NOT NULL DEFAULT false
+);
 
 CREATE TABLE user_profile (
     user_id uuid,
