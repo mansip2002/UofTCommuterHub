@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session
 from flask_mail import Mail, Message
 from flask_cors import CORS
 from lib.account import get_account, create_account, set_account_verified, authenticate
+from lib.globals import db
 
 app = Flask(__name__)
 CORS(app)
@@ -100,7 +101,7 @@ def submit_user_profile():
     cur = db.cursor()
 
     # email = session.get("email")
-    email = "50000"
+    email = "maryam.younis@mail.utoronto.ca"
 
     # Retrieve user_id from the account table based on the email
     cur.execute("SELECT id FROM account WHERE email = %s", (email,))
@@ -132,7 +133,7 @@ def submit_user_profile():
             )
 
     db.commit()
-    return jsonify({"message": "Data submitted successfully"})
+    return jsonify({"message": "Profile updated successfully"})
 
 
 if __name__ == '__main__':

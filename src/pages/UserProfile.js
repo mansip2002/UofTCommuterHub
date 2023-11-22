@@ -51,6 +51,7 @@ const Button = styled.button`
 `;
 
 const UserProfile = () => {
+  const [message, setMessage] = useState('');
   const [userInfo, setUserInfo] = useState({
     name: "",
     startLocation: "",
@@ -120,6 +121,9 @@ const UserProfile = () => {
 		},
 		body: JSON.stringify(sanitizedUserInfo),
 	  });
+
+    const data = await response.json();
+		setMessage(data.message);
   
 	  if (!response.ok) {
 		// Handle error
@@ -220,7 +224,8 @@ const UserProfile = () => {
               </Label>
             </div>
           ))}
-          <Button type="submit">Save</Button>
+          <Button onClick={handleSubmit}>Submit</Button>
+          {message && <p>{message}</p>}
         </form>
       </FormContainer>
     </Container>
