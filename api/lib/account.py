@@ -1,4 +1,4 @@
-from lib.globals import db
+from lib.globals import create_db_instance
 from typing import List, TypedDict
 from lib.hash import generate_random_salt, hash_password
 
@@ -23,6 +23,7 @@ def serialize_account(account: List) -> Account:
     }
 
 def get_account(id: str | None = None, email: str | None = None) -> Account:
+    db = create_db_instance()
     cursor = db.cursor()
 
     cursor.execute("SELECT * FROM account WHERE id=%s OR email=%s", (id,email))
@@ -38,6 +39,7 @@ def get_account(id: str | None = None, email: str | None = None) -> Account:
     
 
 def create_account(email: str, password: str, verification_code: str) -> Account:
+    db = create_db_instance()
     cursor = db.cursor()
 
     salt = generate_random_salt()
@@ -60,6 +62,7 @@ def create_account(email: str, password: str, verification_code: str) -> Account
     return serialize_account(account)
 
 def set_account_verified(id: str) -> Account:
+    db = create_db_instance()
     cursor = db.cursor()
 
     cursor.execute(
