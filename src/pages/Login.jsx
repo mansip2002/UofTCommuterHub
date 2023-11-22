@@ -33,7 +33,7 @@ const Login = () => {
 
     if (response.status === 200) {
       console.log("success");
-      navigate("/matching");
+      navigate(`/user-profile?email=${encodeURIComponent(email)}`);
     } else {
       console.error(data.message);
     }
