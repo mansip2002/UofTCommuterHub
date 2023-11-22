@@ -5,6 +5,7 @@ from lib.account import get_account, create_account, set_account_verified, authe
 from lib.globals import create_db_instance
 from lib.globals import env
 from lib.auth import encode_token
+from lib.auth import decode_token
 from urllib.parse import quote
 
 app = Flask(__name__)
@@ -117,9 +118,11 @@ def submit_user_profile():
     cur = db.cursor()
 
     email = data["email"]
+    token = data["token"]
 
-    # Retrieve user_id from the account table based on the email
-    cur.execute("SELECT id FROM account WHERE email = %s", (email,))
+    decoded = decode_token(token)
+
+    cur.execute("SELECT id FROM account WHERE email = %s", (decoded['email'],))
     result = cur.fetchone()
 
     if not result:

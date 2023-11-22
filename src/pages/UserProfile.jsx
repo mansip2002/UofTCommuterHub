@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { getStorage } from "../lib/storage";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -54,6 +55,7 @@ const Button = styled.button`
 const UserProfile = () => {
   const location = useLocation();
   const email = new URLSearchParams(location.search).get("email");
+  const token = getStorage("capstone-token")
   const [message, setMessage] = useState('');
   const [userInfo, setUserInfo] = useState({
     name: "",
@@ -108,6 +110,7 @@ const UserProfile = () => {
 	// Sanitize user input
 	const sanitizedUserInfo = {
     email: email,
+    token: token,
 	  name: sanitizeString(userInfo.name),
 	  startLocation: sanitizeString(userInfo.startLocation),
 	  endLocation: sanitizeString(userInfo.endLocation),
