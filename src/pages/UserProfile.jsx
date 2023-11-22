@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate} from "react-router-dom";
 import { getStorage } from "../lib/storage";
 import styled from "styled-components";
 
@@ -56,6 +56,7 @@ const UserProfile = () => {
   const location = useLocation();
   const email = new URLSearchParams(location.search).get("email");
   const token = getStorage("capstone-token")
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [userInfo, setUserInfo] = useState({
     name: "",
@@ -69,6 +70,13 @@ const UserProfile = () => {
       friday: { start: "", end: "", isSelected: false },
     },
   });
+
+  useEffect(() => {
+    // Use the effect hook for navigation
+    if (token == null) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
 
   const handleInputChange = (e, type) => {
     const { value } = e.target;
