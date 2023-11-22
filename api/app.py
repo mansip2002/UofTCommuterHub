@@ -2,16 +2,19 @@ from flask import Flask, request, jsonify, session
 from flask_mail import Mail, Message
 from flask_cors import CORS
 from lib.account import get_account, create_account, set_account_verified, authenticate
-from lib.globals import db
+from lib.globals import create_db_instance
+from lib.globals import env
+from lib.auth import encode_token
+from urllib.parse import quote
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": env["BASE_URL"]}})
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'uoftcommuterhub@gmail.com'
-app.config['MAIL_PASSWORD'] = 'opwx fjsf bxto oqpq'
+app.config['MAIL_USERNAME'] = env["MAIL_USERNAME"]
+app.config['MAIL_PASSWORD'] = env["MAIL_PASSWORD"]
 
 mail = Mail(app)
 
@@ -44,8 +47,15 @@ def register_user():
     create_account(email, password, verification_code)
 
     # Send a verification email
-    msg = Message('Email Verification', sender='uoftcommuterhub@gmail.com', recipients=[email])
-    msg.body = f'Your verification code is: {verification_code}'
+    msg = Message(
+        'Email Verification', 
+        sender='uoftcommuterhub@gmail.com', 
+        recipients=[email],
+        body=f'Please click on this link to verify your email: {env["BASE_URL"]}/verify?email={quote(email)}&code={verification_code}'
+    )
+
+    print(f'{env["BASE_URL"]}/verify?email={quote(email)}&code={verification_code}')
+
     mail.send(msg)
 
     return jsonify({'message': 'Registration successful! Check your email for a verification code.'})
@@ -67,13 +77,18 @@ def login():
     
     if not account:
         return jsonify({'message': f'Account for email {email} not found.'}), 404
+
+    if not account['verified']:
+        return jsonify({'message': f'Account for email {email} not verified.'}), 401
     
     is_correct_password = authenticate(account, password)
 
     if not is_correct_password:
         return jsonify({'message': 'Unauthorized.'}), 401
 
-    return jsonify({'message': 'Correct password.'})
+    token = encode_token(email)
+
+    return jsonify({ 'message': 'Correct password.', 'token': token })
 
 
 @app.route('/verify', methods=['POST'])
@@ -98,17 +113,17 @@ def verify_email():
 def submit_user_profile():
     data = request.get_json()
 
+    db = create_db_instance()
     cur = db.cursor()
 
-    # email = session.get("email")
-    email = "maryam.younis@mail.utoronto.ca"
+    email = data["email"]
 
     # Retrieve user_id from the account table based on the email
     cur.execute("SELECT id FROM account WHERE email = %s", (email,))
     result = cur.fetchone()
 
     if not result:
-        return jsonify({"error": "User not found"}), 404
+       return jsonify({"error": "User %s not found" % email}), 404
 
     user_id = result[0]
 
@@ -135,6 +150,7 @@ def submit_user_profile():
     db.commit()
     return jsonify({"message": "Profile updated successfully"})
 
+app.secret_key = "ThisIsNotASecret:p"
 
 if __name__ == '__main__':
     app.run(debug=True)

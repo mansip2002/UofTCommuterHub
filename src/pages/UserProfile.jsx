@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -51,6 +52,8 @@ const Button = styled.button`
 `;
 
 const UserProfile = () => {
+  const location = useLocation();
+  const email = new URLSearchParams(location.search).get("email");
   const [message, setMessage] = useState('');
   const [userInfo, setUserInfo] = useState({
     name: "",
@@ -104,6 +107,7 @@ const UserProfile = () => {
   
 	// Sanitize user input
 	const sanitizedUserInfo = {
+    email: email,
 	  name: sanitizeString(userInfo.name),
 	  startLocation: sanitizeString(userInfo.startLocation),
 	  endLocation: sanitizeString(userInfo.endLocation),
