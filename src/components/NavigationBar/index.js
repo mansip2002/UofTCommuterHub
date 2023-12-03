@@ -9,9 +9,6 @@ const NavigationBar = () => {
         <Nav className="Navigation">
             <NavMenu>
                 <Navlink to="/Login" activeStyle>
-                    Login
-                </Navlink>
-                <Navlink to="/UserProfile" activeStyle>
                     Profile
                 </Navlink>
                 <Navlink to="/Matching" activeStyle>
@@ -23,6 +20,13 @@ const NavigationBar = () => {
                 <Navlink to="/Faq" activeStyle>
                     FAQ
                 </Navlink>
+                <Navlink to="/Login" activeStyle>
+                    Login
+                </Navlink>
+                <Navlink to="/UserProfile" activeStyle>
+                    Sign Up
+                </Navlink>
+                
             </NavMenu>
         </Nav>
     )

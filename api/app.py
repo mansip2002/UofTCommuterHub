@@ -41,9 +41,7 @@ def register_user():
     if not email:
         return jsonify({'message': 'Email is required.'}), 400
     
-    if not email.endswith('utoronto.ca'):
-        return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
-
+    
     if email in users:
         return jsonify({'message': 'Email already registered.'}), 400
 
@@ -51,7 +49,7 @@ def register_user():
     
     # Store the user data (email and verification code)
     users[email] = {'verification_code': verification_code, 'verified': False}
-
+   
     # Send a verification email
     msg = Message('Email Verification', sender='uoftcommuterhub@gmail.com', recipients=[email])
     msg.body = f'Your verification code is: {verification_code}'
@@ -89,6 +87,52 @@ def test():
         })
 
     return jsonify(users)
+
+@app.route('/api/search', methods=['GET'])
+def search():
+    cur = db.cursor()
+    search_term = request.args.get('search', '')
+
+    
+    if search_term and ':' in search_term:
+        # Handle search case when a time is entered
+        query = """
+                SELECT name, start_location, end_location, day_of_week, start_time, email FROM user_profile JOIN account ON account.id = user_profile.user_id
+                WHERE 
+                    user_profile.name ILIKE %s OR
+                    start_location ILIKE %s OR
+                    end_location ILIKE %s OR
+                    day_of_week ILIKE %s OR
+                    start_time = %s
+                """
+        cur.execute(query, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
+    else:
+        query = """
+            SELECT name, start_location, end_location, day_of_week, start_time, email FROM user_profile JOIN account ON account.id = user_profile.user_id
+            WHERE 
+                user_profile.name ILIKE %s OR
+                start_location ILIKE %s OR
+                end_location ILIKE %s OR
+                day_of_week ILIKE %s 
+        """
+        cur.execute(query, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
+
+    results = cur.fetchall()
+    formatted_results = [
+        {
+            "name": row[0],
+            "start_location": row[1],
+            "end_location": row[2],
+            "day_of_week": row[3],
+            "start_time": str(row[4]),
+            "email": row[5],     
+        }
+        for row in results
+    ]
+
+    response = jsonify(formatted_results)
+    return response
+
 
 if __name__ == '__main__':
     app.run(debug=True)
