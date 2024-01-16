@@ -110,11 +110,13 @@ def verify_email():
     else:
         return jsonify({'message': 'Invalid verification code.'}), 400
     
+db = create_db_instance()
+
 @app.route('/user_profile', methods=['POST'])
 def submit_user_profile():
     data = request.get_json()
 
-    db = create_db_instance()
+    
     cur = db.cursor()
 
     email = data["email"]
@@ -154,6 +156,52 @@ def submit_user_profile():
     return jsonify({"message": "Profile updated successfully"})
 
 app.secret_key = "ThisIsNotASecret:p"
+
+
+@app.route('/api/search', methods=['GET'])
+def search():
+    cur = db.cursor()
+    search_term = request.args.get('search', '')
+
+
+    if search_term and ':' in search_term:
+        # Handle search case when a time is entered
+        query = """
+                SELECT name, start_location, end_location, day_of_week, start_time, email FROM user_profile JOIN account ON account.id = user_profile.user_id
+                WHERE 
+                    user_profile.name ILIKE %s OR
+                    start_location ILIKE %s OR
+                    end_location ILIKE %s OR
+                    day_of_week ILIKE %s OR
+                    start_time = %s
+                """
+        cur.execute(query, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
+    else:
+        query = """
+            SELECT name, start_location, end_location, day_of_week, start_time, email FROM user_profile JOIN account ON account.id = user_profile.user_id
+            WHERE 
+                user_profile.name ILIKE %s OR
+                start_location ILIKE %s OR
+                end_location ILIKE %s OR
+                day_of_week ILIKE %s 
+        """
+        cur.execute(query, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
+
+    results = cur.fetchall()
+    formatted_results = [
+        {
+            "name": row[0],
+            "start_location": row[1],
+            "end_location": row[2],
+            "day_of_week": row[3],
+            "start_time": str(row[4]),
+            "email": row[5],     
+        }
+        for row in results
+    ]
+
+    response = jsonify(formatted_results)
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
