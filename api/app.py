@@ -6,6 +6,7 @@ from lib.globals import create_db_instance
 from lib.globals import env
 from lib.auth import encode_token
 from lib.auth import decode_token
+from lib.geocode import geocode_address_osm
 from urllib.parse import quote
 
 app = Flask(__name__)
@@ -135,19 +136,22 @@ def submit_user_profile():
         end_location = data["endLocation"]
         start_time = commuting_time["start"]
         end_time = commuting_time.get("end", None)  # Use get to handle potential missing "end" key
+        start_location_coords = geocode_address_osm(start_location)
+        end_location_coords = geocode_address_osm(end_location)
 
         # Insert entry with start time
         cur.execute(
-            "INSERT INTO user_profile (user_id, name, start_location, end_location, day_of_week, start_time) VALUES (%s, %s, %s, %s, %s, %s)",
-            (user_id, data["name"], start_location, end_location, commuting_time["day"], start_time)
+            "INSERT INTO user_profile (user_id, name, start_location, start_location_coord, end_location, day_of_week, start_time) VALUES (%s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s, %s, %s)",
+            (user_id, data["name"], start_location, start_location_coords[1], start_location_coords[0], end_location, commuting_time["day"], start_time)
         )
+
 
         # Check if end time is provided and not an empty string
         if end_time is not None and end_time != "":
             # Insert entry with end time (locations reversed)
             cur.execute(
-                "INSERT INTO user_profile (user_id, name, start_location, end_location, day_of_week, start_time) VALUES (%s, %s, %s, %s, %s, %s)",
-                (user_id, data["name"], end_location, start_location, commuting_time["day"], end_time)
+                "INSERT INTO user_profile (user_id, name, start_location, start_location_coord, end_location, day_of_week, start_time) VALUES (%s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s, %s, %s)",
+                (user_id, data["name"], end_location, end_location_coords[1], end_location_coords[0], start_location, commuting_time["day"], end_time)
             )
 
     db.commit()
