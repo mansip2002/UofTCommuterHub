@@ -40,3 +40,26 @@
   text-align: center;
   cursor: pointer;
 }
+
+
+.searchBar {
+  width: 90%;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding-top: 10%;
+  padding-left: 10%;
+  display: flex;
+}
+
+.searchCard {
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.searchBox {
+  background-color: rgb(252, 254, 255);
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
