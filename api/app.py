@@ -161,51 +161,56 @@ def submit_user_profile():
 
 app.secret_key = "ThisIsNotASecret:p"
 
-
 @app.route('/api/search', methods=['GET'])
 def search():
-    cur = db.cursor()
-    search_term = request.args.get('search', '')
+    start_location = request.args.get('startLocation')
+    end_location = request.args.get('endLocation')
+    day_of_week = request.args.get('dayOfWeek')
+    start_time = request.args.get('startTime')
 
+    if not (start_location and end_location and day_of_week and start_time):
+        return jsonify({'error': 'Please provide all required parameters'}), 400
 
-    if search_term and ':' in search_term:
-        # Handle search case when a time is entered
+    try:
+        # Convert start location to geography type
+        start_location_coords = geocode_address_osm(start_location)
+        print(start_location_coords)
+        cur = db.cursor()
+
         query = """
-                SELECT name, start_location, end_location, day_of_week, start_time, email FROM user_profile JOIN account ON account.id = user_profile.user_id
-                WHERE 
-                    user_profile.name ILIKE %s OR
-                    start_location ILIKE %s OR
-                    end_location ILIKE %s OR
-                    day_of_week ILIKE %s OR
-                    start_time = %s
-                """
-        cur.execute(query, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
-    else:
-        query = """
-            SELECT name, start_location, end_location, day_of_week, start_time, email FROM user_profile JOIN account ON account.id = user_profile.user_id
-            WHERE 
-                user_profile.name ILIKE %s OR
-                start_location ILIKE %s OR
-                end_location ILIKE %s OR
-                day_of_week ILIKE %s 
+            SELECT name, start_location, end_location, day_of_week, start_time, email 
+            FROM user_profile 
+            JOIN account ON account.id = user_profile.user_id
+            WHERE LOWER(day_of_week) = LOWER(%s)
+            ORDER BY 
+                ST_Distance(user_profile.start_location_coord, ST_SetSRID(ST_MakePoint(%s, %s), 4326)),
+                ABS(EXTRACT(EPOCH FROM user_profile.start_time::TIME - %s::TIME))
+            LIMIT 10
         """
-        cur.execute(query, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
 
-    results = cur.fetchall()
-    formatted_results = [
-        {
-            "name": row[0],
-            "start_location": row[1],
-            "end_location": row[2],
-            "day_of_week": row[3],
-            "start_time": str(row[4]),
-            "email": row[5],     
-        }
-        for row in results
-    ]
+        cur.execute(query, (day_of_week, start_location_coords[1], start_location_coords[0], start_time))
+        results = cur.fetchall()
 
-    response = jsonify(formatted_results)
-    return response
+        print("Number of rows returned:", len(results))
+        print("Results:", results)
+        formatted_results = [
+            {
+                "name": row[0],
+                "start_location": row[1],
+                "end_location": row[2],
+                "day_of_week": row[3],
+                "start_time": str(row[4]),
+                "email": row[5],    
+            }
+            for row in results
+        ]
 
+        response = jsonify(formatted_results)
+        return response
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    
 if __name__ == '__main__':
     app.run(debug=True)

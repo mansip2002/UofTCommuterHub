@@ -1,73 +1,149 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 const MatchingSystem = () => {
-	const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+  const [startLocation, setStartLocation] = useState('');
+  const [endLocation, setEndLocation] = useState('');
+  const [dayOfWeek, setDayOfWeek] = useState('Monday'); // Default to Monday
+  const [startTime, setStartTime] = useState(''); // Default to an empty string
 
-    const handleSearch = async () => {
-        try {
-            const response = await fetch(`http://127.0.0.1:5000/api/search?search=${searchTerm}`,
-			{
-				  method: "GET",
-				  headers: {
-					"Content-Type": "application/json",
-				  },
-		    });
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchErrorMessage, setSearchErrorMessage] = useState('');
 
-            const data = await response.json();
-            setSearchResults(data);
+  const handleSearch = async () => {
+    if (!startLocation || !endLocation || !dayOfWeek || !startTime) {
+      setSearchErrorMessage('Please fill in all fields before searching.');
+      return;
+    }
 
-        } catch (error) {
-            // for debugging purposes
-            console.error('Logged search error is:', error);
-        }
-    };
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/search?startLocation=${startLocation}&endLocation=${endLocation}&dayOfWeek=${dayOfWeek}&startTime=${startTime}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-	return (
-		<div className="matchingSystem">
-			<div className="searchBar">
-                <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Please enter your query here"
-                    className="form-control rounded"
-                />
-                <button type="button" onClick={handleSearch} className="btn btn-outline-primary">
-                    Search
-                </button>
-            </div>
+      const data = await response.json();
+      setSearchResults(data);
+      setSearchErrorMessage('');
 
-            <br></br>
+    } catch (error) {
+      // For debugging purposes
+      console.error('Logged search error is:', error);
+    }
+  };
 
-            <div class="container">
-                <div class="row">
-                    <div class="row justify-content-center">
-                        <ul>
-                            {searchResults.map(result => (
+  // Generate time options for the dropdown (00:00 to 23:00)
+  const timeOptions = Array.from({ length: 24 }, (_, i) => {
+    const hour = i < 10 ? `0${i}` : `${i}`;
+    return `${hour}:00`;
+  });
 
-                                <div className="searchCard">
-                                    <div className="searchBox" key={result.user_id}>
-                                        <br/>
-                                        <span style={{ color: 'blue' }}>Name:</span> {result.name},{' '}
-                                        <span style={{ color: 'blue' }}>Email:</span> {result.email},{' '}
-                                        <span style={{ color: 'blue' }}>Day of the Week:</span> {result.day_of_week},{' '}
-                                        <span style={{ color: 'blue' }}>Start Time:</span> {result.start_time},{' '}
-                                        <span style={{ color: 'blue' }}>Start Location:</span>{' '}{result.start_location},{' '}
-                                        <span style={{ color: 'blue' }}>End Location:</span>{' '}{result.end_location}
-                                        <br/>
-                                    </div>
-                                    <br/>
-                                </div>
+  return (
+    <div className="matchingSystem">
+      {/* Start Location */}
+      <div className="searchRow">
+        <label htmlFor="startLocation">Start Location:</label>
+        <input
+          type="text"
+          id="startLocation"
+          value={startLocation}
+          onChange={(e) => setStartLocation(e.target.value)}
+          placeholder="Start Location"
+          className="form-control rounded"
+        />
+      </div>
 
-                            ))}
-                        </ul>
-                   </div>
+      {/* End Location */}
+      <div className="searchRow">
+        <label htmlFor="endLocation">End Location:</label>
+        <input
+          type="text"
+          id="endLocation"
+          value={endLocation}
+          onChange={(e) => setEndLocation(e.target.value)}
+          placeholder="End Location"
+          className="form-control rounded"
+        />
+      </div>
+
+      {/* Day of the Week and Start Time */}
+      <div className="searchRow">
+        <label htmlFor="dayOfWeek">Day of the Week:</label>
+        <select
+          id="dayOfWeek"
+          value={dayOfWeek}
+          onChange={(e) => setDayOfWeek(e.target.value)}
+          className="form-control rounded"
+        >
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+        </select>
+
+        <label htmlFor="startTime">Start Time:</label>
+        <select
+          id="startTime"
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+          className="form-control rounded"
+        >
+          <option value="">Select Time</option>
+          {timeOptions.map(time => (
+            <option key={time} value={time}>{time}</option>
+          ))}
+        </select>
+
+        {/* Search Button */}
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="btn btn-outline-primary"
+        >
+          Search
+        </button>
+      </div>
+
+      {/* Search Error Message */}
+      {searchErrorMessage && (
+        <div className="searchRow">
+          <p style={{ color: 'red' }}>{searchErrorMessage}</p>
+        </div>
+      )}
+
+      <br />
+
+      <div className="container">
+        <div className="row">
+          <div className="row justify-content-center">
+            <ul>
+              {searchResults.map(result => (
+                <div className="searchCard" key={result.user_id}>
+                  <div className="searchBox">
+                    <br />
+                    <span style={{ color: 'blue' }}>Name:</span> {result.name},{' '}
+                    <span style={{ color: 'blue' }}>Email:</span> {result.email},{' '}
+                    <span style={{ color: 'blue' }}>Day of the Week:</span> {result.day_of_week},{' '}
+                    <span style={{ color: 'blue' }}>Start Time:</span> {result.start_time},{' '}
+                    <span style={{ color: 'blue' }}>Start Location:</span>{' '}{result.start_location},{' '}
+                    <span style={{ color: 'blue' }}>End Location:</span>{' '}{result.end_location}
+                    <br />
+                  </div>
+                  <br />
                 </div>
-            </div>
-
-		</div>
-	);
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default MatchingSystem;
+
+
+
