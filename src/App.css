@@ -63,3 +63,13 @@
   align-items: center;
   justify-content: center;
 }
+
+.autocomplete-suggestions {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+}
