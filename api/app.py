@@ -37,8 +37,8 @@ def register_user():
     if not password:
         return jsonify({'message': 'Password is required.'}), 400
     
-    if not email.endswith('utoronto.ca'):
-        return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
+    # if not email.endswith('utoronto.ca'):
+    #     return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
 
     if get_account(email=email):
         return jsonify({'message': 'Email already registered.'}), 400

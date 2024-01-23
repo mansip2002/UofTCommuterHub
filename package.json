@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run decrypt\" \"npm run server\" \"npm start\"",
     "encrypt": "senv encrypt .env -o .env.enc",
     "decrypt": "senv decrypt .env.enc -o .env",
-    "server": "python ./api/app.py",
+    "server": "python3 ./api/app.py",
     "start": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",

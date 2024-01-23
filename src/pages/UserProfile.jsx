@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate} from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getStorage } from "../lib/storage";
 import styled from "styled-components";
 
@@ -55,9 +55,9 @@ const Button = styled.button`
 const UserProfile = () => {
   const location = useLocation();
   const email = new URLSearchParams(location.search).get("email");
-  const token = getStorage("capstone-token")
+  const token = getStorage("capstone-token");
   const navigate = useNavigate();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [userInfo, setUserInfo] = useState({
     name: "",
     startLocation: "",
@@ -113,53 +113,56 @@ const UserProfile = () => {
   };
 
   const handleSubmit = async (e) => {
-	e.preventDefault();
-  
-	// Sanitize user input
-	const sanitizedUserInfo = {
-    email: email,
-    token: token,
-	  name: sanitizeString(userInfo.name),
-	  startLocation: sanitizeString(userInfo.startLocation),
-	  endLocation: sanitizeString(userInfo.endLocation),
-	  commutingTimes: Object.keys(userInfo.commutingTimes).map((day) => {
-		const { start, end, isSelected } = userInfo.commutingTimes[day];
-		return isSelected ? { day, start: sanitizeString(start), end: sanitizeString(end) } : null;
-	  }).filter(Boolean),
-	};
-  
-	try {
-	  const response = await fetch("http://127.0.0.1:5000/user_profile", {
-		method: "POST",
-		headers: {
-		  "Content-Type": "application/json",
-		},
-		body: JSON.stringify(sanitizedUserInfo),
-	  });
+    e.preventDefault();
 
-    const data = await response.json();
-		setMessage(data.message);
-  
-	  if (!response.ok) {
-		// Handle error
-		console.error("Error submitting data to the server");
-	  } else {
-		// Handle success
-		console.log("Data submitted successfully");
-	  }
-	} catch (error) {
-	  console.error("Error:", error);
-	}
+    // Sanitize user input
+    const sanitizedUserInfo = {
+      email: email,
+      token: token,
+      name: sanitizeString(userInfo.name),
+      startLocation: sanitizeString(userInfo.startLocation),
+      endLocation: sanitizeString(userInfo.endLocation),
+      commutingTimes: Object.keys(userInfo.commutingTimes)
+        .map((day) => {
+          const { start, end, isSelected } = userInfo.commutingTimes[day];
+          return isSelected
+            ? { day, start: sanitizeString(start), end: sanitizeString(end) }
+            : null;
+        })
+        .filter(Boolean),
+    };
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/user_profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sanitizedUserInfo),
+      });
+
+      const data = await response.json();
+      setMessage(data.message);
+
+      if (!response.ok) {
+        // Handle error
+        console.error("Error submitting data to the server");
+      } else {
+        // Handle success
+        console.log("Data submitted successfully");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
-  
+
   // Helper function to sanitize strings
   const sanitizeString = (input) => {
-	// Implement your sanitization logic here
-	// For example, you can use a library like DOMPurify
-	// or custom logic to strip HTML tags, prevent SQL injection, etc.
-	return input; // Placeholder, replace with actual sanitization
+    // Implement your sanitization logic here
+    // For example, you can use a library like DOMPurify
+    // or custom logic to strip HTML tags, prevent SQL injection, etc.
+    return input; // Placeholder, replace with actual sanitization
   };
-  
 
   return (
     <Container>
