@@ -5,3 +5,4 @@ psycopg
 python-dotenv
 bcrypt
 PyJWT
+gunicorn==21.2.0
