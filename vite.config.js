@@ -15,6 +15,6 @@ export default defineConfig({
     alias: { "/src": resolve(cwd(), "src") },
   },
   server: {
-    port: 3000,
+    port: 10000,
   },
 });
