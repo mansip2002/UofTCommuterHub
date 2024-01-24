@@ -13,7 +13,7 @@ const Verify = () => {
       return navigate("/login");
     }
 
-    const response = await fetch("http://127.0.0.1:5000/verify", {
+    const response = await fetch("https://uoftcommuterhubbackend-dntd.onrender.com/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
