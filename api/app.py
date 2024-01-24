@@ -11,7 +11,7 @@ from urllib.parse import quote
 import os
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": env["BASE_URL"]}})
+CORS(app, resources={r"/*": {"origins": "https://uoftcommuterhubbackend.onrender.com"}})
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
