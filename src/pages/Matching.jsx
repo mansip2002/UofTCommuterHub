@@ -16,7 +16,7 @@ const MatchingSystem = () => {
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/search?startLocation=${startLocation}&endLocation=${endLocation}&dayOfWeek=${dayOfWeek}&startTime=${startTime}`,
+      const response = await fetch(`https://uoftcommuterhubbackend-dntd.onrender.com/api/search?startLocation=${startLocation}&endLocation=${endLocation}&dayOfWeek=${dayOfWeek}&startTime=${startTime}`,
         {
           method: "GET",
           headers: {
