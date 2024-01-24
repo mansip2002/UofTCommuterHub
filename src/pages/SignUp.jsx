@@ -9,7 +9,7 @@ const Signup = () => {
   const [verifyEmailSent, setVerifyEmailSent] = useState(false);
 
   const onSubmit = async () => {
-    const response = await fetch("http://127.0.0.1:5000/register", {
+    const response = await fetch("https://uoftcommuterhubbackend-dntd.onrender.com/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
