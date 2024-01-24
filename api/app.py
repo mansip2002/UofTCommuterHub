@@ -8,6 +8,7 @@ from lib.auth import encode_token
 from lib.auth import decode_token
 from lib.geocode import geocode_address_osm
 from urllib.parse import quote
+import os
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": env["BASE_URL"]}})
@@ -213,4 +214,5 @@ def search():
 
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
