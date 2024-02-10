@@ -19,7 +19,7 @@ const ManageCommutes = () => {
   const getUser = async () => {
     try {
       const response = await fetch(
-        `${BACKEND_URL}/api/user?token=${getStorage("capstone-token")}`,
+        `${BACKEND_URL}/user?token=${getStorage("capstone-token")}`,
         {
           method: "GET",
           headers: {
@@ -30,6 +30,10 @@ const ManageCommutes = () => {
 
       if (response.status === 401) {
         navigate("/sign-out");
+      }
+
+      if (!response.ok) {
+        throw Error(`Fetch failed with status ${response.status}`);
       }
 
       const data = await response.json();
@@ -46,9 +50,7 @@ const ManageCommutes = () => {
 
     try {
       const response = await fetch(
-        `${BACKEND_URL}/api/user_commutes?token=${getStorage(
-          "capstone-token"
-        )}`,
+        `${BACKEND_URL}/user_commutes?token=${getStorage("capstone-token")}`,
         {
           method: "GET",
           headers: {
@@ -230,7 +232,7 @@ const ManageCommutes = () => {
       </form>
 
       {/* Error Message */}
-      {error && <div className="invalid-feedback">{error}</div>}
+      {error && <div className="text-danger">{error}</div>}
 
       {/* Success Message */}
       {message && <div className="text-success">{message}</div>}

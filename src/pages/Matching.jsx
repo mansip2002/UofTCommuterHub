@@ -22,7 +22,7 @@ const MatchingSystem = () => {
     }
 
     try {
-      let url = `${BACKEND_URL}/api/search?startLocation=${startLocation}&endLocation=${endLocation}&dayOfWeek=${dayOfWeek}&startTime=${startTime}`;
+      let url = `${BACKEND_URL}/search?startLocation=${startLocation}&endLocation=${endLocation}&dayOfWeek=${dayOfWeek}&startTime=${startTime}`;
 
       if (token) {
         url += `&token=${token}`;

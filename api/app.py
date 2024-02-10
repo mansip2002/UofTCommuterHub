@@ -1,3 +1,4 @@
+from sys import stderr
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from flask_cors import CORS
@@ -28,45 +29,53 @@ import secrets
 def generate_verification_code():
     return secrets.token_urlsafe(16)
 
+def print_error(e, route: str = "unknown"):
+    print("ERROR IN ROUTE", route + ":", e, file=stderr, flush=True)
+
+
 @app.route('/register', methods=['POST'])
 def register_user():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    email = data.get('email')
-    password = data.get('password')
-    full_name = data.get('full_name')
+        email = data.get('email')
+        password = data.get('password')
+        full_name = data.get('full_name')
 
-    if not full_name:
-        return jsonify({'message': 'Name is required.'}), 400
+        if not full_name:
+            return jsonify({'message': 'Name is required.'}), 400
 
-    if not email:
-        return jsonify({'message': 'Email is required.'}), 400
+        if not email:
+            return jsonify({'message': 'Email is required.'}), 400
 
-    if not password:
-        return jsonify({'message': 'Password is required.'}), 400
-    
-    if not email.endswith('utoronto.ca'):
-        return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
+        if not password:
+            return jsonify({'message': 'Password is required.'}), 400
+        
+        # if not email.endswith('utoronto.ca'):
+        #     return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
 
-    if get_user(email=email):
-        return jsonify({'message': 'Email already registered.'}), 400
+        if get_user(email=email):
+            return jsonify({'message': 'Email already registered.'}), 400
 
-    verification_code = generate_verification_code()
-    
-    # Store the user data (email and verification code)
-    create_user(email, full_name, password, verification_code)
+        verification_code = generate_verification_code()
+        
+        # Store the user data (email and verification code)
+        create_user(email, full_name, password, verification_code)
 
-    # Send a verification email
-    msg = Message(
-        'Email Verification', 
-        sender='uoftcommuterhub@gmail.com', 
-        recipients=[email],
-        body=f'Please click on this link to verify your email: {env["BASE_URL"]}/verify?email={quote(email)}&code={verification_code}'
-    )
+        # Send a verification email
+        msg = Message(
+            'Email Verification', 
+            sender='uoftcommuterhub@gmail.com', 
+            recipients=[email],
+            body=f'Please click on this link to verify your email: {env["BASE_URL"]}/verify?email={quote(email)}&code={verification_code}'
+        )
 
-    mail.send(msg)
+        mail.send(msg)
 
-    return jsonify({'message': 'Registration successful! Check your email for a verification code.'})
+        return jsonify({'message': 'Registration successful! Check your email for a verification code.'})
+    except Exception as e:
+        print_error(e, "/register")
+        return jsonify({"error": "There was an error."}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -99,7 +108,7 @@ def login():
 
         return jsonify({ 'message': 'Correct password.', 'token': token })
     except Exception as e:
-        print(e)
+        print_error(e, "/login")
         return jsonify({"error": "There was an error."}), 500
 
 
@@ -122,11 +131,11 @@ def verify_email():
         else:
             return jsonify({'message': 'Invalid verification code.'}), 400
     except Exception as e:
-        print(e)
-        return jsonify({"error": "There was an error."}), 500
+        print_error(e, "/verify")
+        return jsonify({"error": str(e)}), 500
     
 # Get user profile
-@app.route('/api/user', methods=['GET'])
+@app.route('/user', methods=['GET'])
 def user():
     try:
         token = request.args.get('token')
@@ -154,7 +163,7 @@ def user():
             "verified": user['verified']
         })
     except Exception as e:
-        print(e)
+        print_error(e, "/user")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/user_commute', methods=['POST'])
@@ -204,13 +213,13 @@ def user_commute():
 
         return jsonify({"message": "Profile updated successfully"})
     except Exception as e:
-        print(e)
+        print_error(e, "/user_commute")
         return jsonify({"error": "There was an error."}), 500
 
 app.secret_key = "ThisIsNotASecret:p"
 
 # Get all of a user's commutes
-@app.route('/api/user_commutes', methods=['GET'])
+@app.route('/user_commutes', methods=['GET'])
 def user_commutes():
     try:
         token = request.args.get('token')
@@ -245,11 +254,11 @@ def user_commutes():
 
         return jsonify(formatted_results)
     except Exception as e:
-        print(e)
+        print_error(e, "/user_commutes")
         return jsonify({"error": "There was an error."}), 500
 
 
-@app.route('/api/search', methods=['GET'])
+@app.route('/search', methods=['GET'])
 def search():
     start_location = request.args.get('startLocation')
     end_location = request.args.get('endLocation')
@@ -305,7 +314,8 @@ def search():
         return response
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print_error(e, "/search")
+        return jsonify({'error': "There was an error."}), 500
 
     
 if __name__ == '__main__':

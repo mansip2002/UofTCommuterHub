@@ -63,7 +63,7 @@ def set_user_verified(id: str) -> User:
 
     cursor.execute(
         """--sql
-            UPDATE account 
+            UPDATE user_profile 
             SET verified = true
             WHERE id = %s
             RETURNING *

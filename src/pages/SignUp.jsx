@@ -9,23 +9,44 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [verifyEmailSent, setVerifyEmailSent] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async () => {
-    const response = await fetch(`${BACKEND_URL}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password, full_name: fullName }),
-    });
+    setError("");
+    setIsLoading(true);
 
-    const data = await response.json();
-    setMessage(data.message);
+    try {
+      if (!email || !password || !fullName) {
+        setError("Please fill out all required fields.");
+        setIsLoading(false);
+        return;
+      }
 
-    if (response.status === 200) {
-      console.log("Success.");
-      setVerifyEmailSent(true);
+      const response = await fetch(`${BACKEND_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, full_name: fullName }),
+      });
+
+      const data = await response.json();
+      setMessage(data.message);
+
+      if (!response.ok) {
+        throw Error(`Fetch failed with status ${response.status}`);
+      }
+
+      if (response.status === 200) {
+        setVerifyEmailSent(true);
+      }
+    } catch (e) {
+      console.error(e);
+      setError("There was an error signing you up. Please try again later.");
     }
+
+    setIsLoading(false);
   };
 
   if (verifyEmailSent) {
@@ -51,6 +72,7 @@ const Signup = () => {
           <h2 className="loginTitle">Signup</h2>
           <div className="form-group">
             <label>Full name</label>
+            <span className="text-danger">*</span>
             <input
               className="form-control"
               type="email"
@@ -61,6 +83,7 @@ const Signup = () => {
           </div>
           <div className="form-group">
             <label>Email</label>
+            <span className="text-danger">*</span>
             <input
               className="form-control"
               type="email"
@@ -71,6 +94,7 @@ const Signup = () => {
           </div>
           <div className="form-group">
             <label>Password</label>
+            <span className="text-danger">*</span>
             <input
               className="form-control"
               type="password"
@@ -84,6 +108,7 @@ const Signup = () => {
               className="btn btn-primary"
               type="button"
               onClick={onSubmit}
+              disabled={isLoading}
             >
               Sign Up
             </button>
@@ -94,6 +119,7 @@ const Signup = () => {
               Already have an account? <Link to="/login">Login</Link>
             </p>
           </div>
+          {error && <div className="text-danger text-center">{error}</div>}
         </form>
       </div>
     </div>

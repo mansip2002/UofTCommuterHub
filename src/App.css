@@ -29,10 +29,6 @@ main {
   min-width: 12rem;
 }
 
-.invalid-feedback {
-  display: block !important;
-}
-
 .sticky-menu {
   display: flex;
   align-items: center;

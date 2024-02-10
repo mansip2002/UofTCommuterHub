@@ -6,7 +6,7 @@ CREATE TABLE user_profile (
     salt VARCHAR(255) NOT NULL,
     created_date TIMESTAMP NOT NULL DEFAULT NOW(),
     verification_code VARCHAR(255) NOT NULL,
-    verified BOOLEAN NOT NULL DEFAULT false
+    verified BOOLEAN NOT NULL -- DEFAULT false
 );
 
 CREATE TABLE user_commute (
