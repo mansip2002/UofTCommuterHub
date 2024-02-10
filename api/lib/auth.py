@@ -6,8 +6,8 @@ from flask import request, jsonify
 def encode_token(email: str):
   token = encode({
       'email': email,
-      # Token expires in 2 hours
-      'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+      # Token expires in 2 days
+      'exp': datetime.datetime.utcnow() + datetime.timedelta(days=2)
   }, env["JWT_SECRET"], algorithm="HS256")
   
   return token

@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CiCircleCheck } from "react-icons/ci";
+import { BACKEND_URL } from "../lib/globals";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [verifyEmailSent, setVerifyEmailSent] = useState(false);
 
   const onSubmit = async () => {
-    const response = await fetch("https://uoftcommuterhubbackend-dntd.onrender.com/register", {
+    const response = await fetch(`${BACKEND_URL}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, full_name: fullName }),
     });
 
     const data = await response.json();
@@ -48,6 +50,16 @@ const Signup = () => {
         <form className="loginContainer">
           <h2 className="loginTitle">Signup</h2>
           <div className="form-group">
+            <label>Full name</label>
+            <input
+              className="form-control"
+              type="email"
+              placeholder="Enter your first and last name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            ></input>
+          </div>
+          <div className="form-group">
             <label>Email</label>
             <input
               className="form-control"
@@ -67,7 +79,7 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
             ></input>
           </div>
-          <div className="d-grid gap-2">
+          <div className="d-grid gap-2 mt-1">
             <button
               className="btn btn-primary"
               type="button"

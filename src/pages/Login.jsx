@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { setStorage } from "../lib/storage";
 import { useToast } from "../lib/toast";
+import { BACKEND_URL } from "../lib/globals";
 
 const Login = () => {
   const { showToast } = useToast();
@@ -19,7 +20,7 @@ const Login = () => {
   }, [params]);
 
   const onSubmit = async () => {
-    const response = await fetch("https://uoftcommuterhubbackend-dntd.onrender.com/login", {
+    const response = await fetch(`${BACKEND_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +34,7 @@ const Login = () => {
 
     if (response.status === 200) {
       console.log("success");
-      navigate(`/user-profile?email=${encodeURIComponent(email)}`);
+      navigate(`/manage-commutes`);
     } else {
       console.error(data.message);
     }

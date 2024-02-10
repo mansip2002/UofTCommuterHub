@@ -27,3 +27,11 @@ If this doesn't work for whatever reason, you can try running these parts separa
 1. Decrypt: `npm run decrypt` (only when new variables are added)
 2. Python: `python ./api/app.py`
 3. React: `npm start`
+
+## How to update environment variables locally
+
+1. Stop the app
+2. Update the `.env` file
+3. Run `npm run encrypt` in the root directory
+
+This will only work if you've already run `npm install` in the root directory.
