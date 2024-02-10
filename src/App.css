@@ -191,3 +191,9 @@ main {
     padding-right: 2rem;
   }
 }
+
+.faq-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
