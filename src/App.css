@@ -29,7 +29,7 @@ main {
   min-width: 12rem;
 }
 
-.sticky-menu {
+.menu-sticky {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,10 +42,12 @@ main {
   border-bottom: 1px solid rgb(209, 209, 209);
 }
 
-.sticky-menu > div {
+.menu-sticky > div {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 1rem;
+  min-width: 15rem;
 }
 
 .menu-link {
@@ -181,7 +183,7 @@ main {
 }
 
 @media (max-width: 1200px) {
-  .sticky-menu {
+  .menu-sticky {
     padding-left: 2rem;
     padding-right: 2rem;
   }

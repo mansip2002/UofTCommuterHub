@@ -19,10 +19,10 @@ export const Menu = () => {
   }, []);
 
   return (
-    <div className="sticky-menu">
+    <div className="menu-sticky">
       <Logo />
 
-      <div style={{ paddingRight: "3rem" }}>
+      <div>
         <MenuLink to="/manage-commutes">My Commutes</MenuLink>
         <MenuLink to="/matching">Find Matches</MenuLink>
         <MenuLink to="/faq">Learn</MenuLink>
