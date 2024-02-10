@@ -20,7 +20,15 @@ db = create_db_instance()
 def create_cursor():
     global db
 
+    # Check if connection is closed
     if (db.closed):
+        db = create_db_instance()
+        return db.cursor()
+    
+    # Check if connection is still active
+    try:
+        db.cursor().execute("SELECT 1")
+    except:
         db = create_db_instance()
         return db.cursor()
     
