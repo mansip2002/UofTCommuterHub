@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run decrypt\" \"npm run server\" \"npm start\"",
-    "encrypt": "senv encrypt .env -o .env.enc",
-    "decrypt": "senv decrypt .env.enc -o .env",
+    "encrypt": "senv encrypt ./api/.env -o .env.enc",
+    "decrypt": "senv decrypt .env.enc -o ./api/.env",
     "server": "python ./api/app.py",
     "start": "vite",
     "build": "vite build",

@@ -1,6 +1,9 @@
-# Getting Started with Create React App
+# UofT Commuter Hub
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Test live on production
+
+**Frontend**: https://uoft-commuter-hub.ambitioussmoke-155a24e2.eastus.azurecontainerapps.io \
+**Backend**: https://maryam-capstone-backend.niceground-7634a6f1.eastus.azurecontainerapps.io
 
 ## How to run the app
 
