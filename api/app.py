@@ -9,7 +9,7 @@ from lib.auth import decode_token
 from lib.geocode import geocode_address_osm
 from urllib.parse import quote
 from jwt import ExpiredSignatureError, DecodeError, InvalidTokenError
-import os
+from waitress import serve
 
 app = Flask(__name__)
 
@@ -32,6 +32,10 @@ def generate_verification_code():
 def print_error(e, route: str = "unknown"):
     print("ERROR IN ROUTE", route + ":", e, file=stderr, flush=True)
 
+
+@app.route('/', methods=['GET'])
+def hello_world():
+    return 'The backend is running!'
 
 @app.route('/register', methods=['POST'])
 def register_user():
@@ -317,7 +321,8 @@ def search():
         print_error(e, "/search")
         return jsonify({'error': "There was an error."}), 500
 
-    
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(env.get('PORTX', 5000)), debug=env["ENVIRONMENT"] == "development")
 
+if (env.get("ENVIRONMENT") == "development"):    
+    app.run(host='0.0.0.0', port=int(env.get('PORT', 5000)), debug=True)
+else:
+    serve(app, host='0.0.0.0', port=env.get('PORT', 5000))
