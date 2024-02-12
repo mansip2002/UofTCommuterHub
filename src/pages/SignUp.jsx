@@ -75,7 +75,7 @@ const Signup = () => {
             <span className="text-danger">*</span>
             <input
               className="form-control"
-              type="email"
+              type="text"
               placeholder="Enter your first and last name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}

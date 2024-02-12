@@ -175,6 +175,7 @@ const ManageCommutes = () => {
           </label>
           <select
             id="dayOfWeek"
+            name="dayOfWeek"
             value={dayOfWeek}
             onChange={(e) => setDayOfWeek(e.target.value)}
             className="form-select rounded"
@@ -192,6 +193,7 @@ const ManageCommutes = () => {
           </label>
           <select
             id="startTime"
+            name="startTime"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             className="form-select rounded"
@@ -208,6 +210,7 @@ const ManageCommutes = () => {
           <label htmlFor="startTime">Return time</label>
           <select
             id="startTime"
+            name="returnTime"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             className="form-select rounded"
