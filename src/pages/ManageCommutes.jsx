@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getStorage } from "../lib/storage";
 import { BACKEND_URL, START_TIME_OPTIONS } from "../lib/globals";
+import axios from "axios";
 
 const ManageCommutes = () => {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ const ManageCommutes = () => {
   const [commutes, setCommutes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
+  const [startLocationSuggestions, setStartLocationSuggestions] = useState([]); 
+  const [endLocationSuggestions, setEndLocationSuggestions] = useState([]); 
 
   const getUser = async () => {
     try {
@@ -43,6 +46,39 @@ const ManageCommutes = () => {
       setError("There was an error fetching your commutes. Please try again.");
       console.error("Error:", error);
     }
+  };
+
+  const fetchLocationSuggestions = async (query, setLocationSuggestions) => {
+    try {
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${query}&bounded=1&viewbox=-141.002622009,41.6751050889,-52.6480987209,83.23324&countrycodes=CA`
+      );
+      setLocationSuggestions(response.data);
+    } catch (error) {
+      console.error("Error fetching location suggestions:", error);
+    }
+  };
+
+  const handleStartLocationChange = (event) => {
+    const query = event.target.value;
+    setStartLocation(query);
+    fetchLocationSuggestions(query, setStartLocationSuggestions);
+  };
+
+  const handleEndLocationChange = (event) => {
+    const query = event.target.value;
+    setEndLocation(query);
+    fetchLocationSuggestions(query, setEndLocationSuggestions);
+  };
+
+  const handleStartLocationClick = (suggestion) => {
+    setStartLocation(suggestion.display_name);
+    setStartLocationSuggestions([]);
+  };
+
+  const handleEndLocationClick = (suggestion) => {
+    setEndLocation(suggestion.display_name);
+    setEndLocationSuggestions([]);
   };
 
   const getCommutes = async () => {
@@ -147,10 +183,22 @@ const ManageCommutes = () => {
             type="text"
             id="startLocation"
             value={startLocation}
-            onChange={(e) => setStartLocation(e.target.value)}
+            onChange={handleStartLocationChange}
             placeholder="Start Location"
             className="form-control rounded"
           />
+          <div className="suggestions-container">
+            <ul className="suggestions-list">
+              {startLocationSuggestions.map((suggestion) => (
+                <li
+                  key={suggestion.place_id}
+                  onClick={() => handleStartLocationClick(suggestion)}
+                >
+                  {suggestion.display_name}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* End Location */}
@@ -162,10 +210,22 @@ const ManageCommutes = () => {
             type="text"
             id="endLocation"
             value={endLocation}
-            onChange={(e) => setEndLocation(e.target.value)}
+            onChange={handleEndLocationChange}
             placeholder="End Location"
             className="form-control rounded"
           />
+          <div className="suggestions-container">
+            <ul className="suggestions-list">
+              {endLocationSuggestions.map((suggestion) => (
+                <li
+                  key={suggestion.place_id}
+                  onClick={() => handleEndLocationClick(suggestion)}
+                >
+                  {suggestion.display_name}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Day of the Week and Leave time */}
