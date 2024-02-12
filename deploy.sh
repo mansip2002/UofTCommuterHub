@@ -1,14 +1,14 @@
 
 # Frontend
-# az containerapp up \
-#   --name 'uoft-commuter-hub' \
-#   --resource-group 'expensify-temp' \
-#   --location eastus \
-#   --environment 'uoft-commuter-hub-env' \
-#   --context-path . \
-#   --source . \
-#   --ingress external \
-#   --target-port 10000
+az containerapp up \
+  --name 'uoft-commuter-hub' \
+  --resource-group 'expensify-temp' \
+  --location eastus \
+  --environment 'uoft-commuter-hub-env' \
+  --context-path . \
+  --source . \
+  --ingress external \
+  --target-port 10000
   
 # Backend (ensure to update the BASE_URL env variable before running)
 az containerapp up \
