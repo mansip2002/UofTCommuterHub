@@ -188,28 +188,25 @@ def user_commute():
         start_location = data["startLocation"]
         end_location = data["endLocation"]
         start_time = data["startTime"]
-        end_time = data["endTime"]
+        end_time = data.get("endTime", None)
         day_of_week = data["dayOfWeek"]
 
-        # We always compare by home location
-        # We care if their homes are closeby, whether they're going to school or returning from school
-        # Of course, we check to make sure either one of their start or end locations are equal (both leaving or going to school) while matching
-        home_location = start_location if end_location == "40 St George St" else end_location
-        home_location_coords = geocode_address_osm(home_location)
+        start_location_coords = geocode_address_osm(start_location)
 
         # Insert entry with start time
         cursor.execute(
             "INSERT INTO user_commute (user_id, start_location, home_location_coords, end_location, day_of_week, start_time) VALUES (%s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s, %s, %s)",
-            (user_id, start_location, home_location_coords[1], home_location_coords[0], end_location, day_of_week, start_time)
+            (user_id, start_location, start_location_coords[1], start_location_coords[0], end_location, day_of_week, start_time)
         )
 
 
         # Check if end time is provided and not an empty string
         if end_time is not None and end_time != "":
             # Insert entry with end time (locations reversed)
+            end_location_coords = geocode_address_osm(end_location)
             cursor.execute(
                 "INSERT INTO user_commute (user_id, start_location, home_location_coords, end_location, day_of_week, start_time) VALUES (%s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s, %s, %s)",
-                (user_id, end_location, home_location_coords[1], home_location_coords[0], start_location, day_of_week, end_time)
+                (user_id, end_location, end_location_coords[1], end_location_coords[0], start_location, day_of_week, end_time)
             )
 
         commit_to_db()
