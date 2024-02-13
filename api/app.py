@@ -281,7 +281,7 @@ def search():
 
     try:
         # Convert home location to geography type
-        home_location = start_location if end_location == "40 St George St" else end_location
+        home_location = start_location
         home_location_coords = geocode_address_osm(home_location)
         cur = create_cursor()
 
@@ -290,18 +290,16 @@ def search():
             FROM user_commute 
             JOIN user_profile ON user_profile.id = user_commute.user_id
             WHERE 
-                LOWER(day_of_week) = LOWER(%s) AND 
-                (LOWER(start_location) = LOWER(%s) OR LOWER(end_location) = LOWER(%s)) AND
-                email <> %s
+                LOWER(day_of_week) = LOWER(%s) 
+                AND email <> %s
             ORDER BY 
                 ST_Distance(user_commute.home_location_coords, ST_SetSRID(ST_MakePoint(%s, %s), 4326)),
                 ABS(EXTRACT(EPOCH FROM user_commute.start_time::TIME - %s::TIME))
             LIMIT 10
         """
 
-        cur.execute(query, (day_of_week, start_location, end_location, user['email'] if user else '', home_location_coords[1], home_location_coords[0], start_time))
+        cur.execute(query, (day_of_week, user['email'] if user else '', home_location_coords[1], home_location_coords[0], start_time))
         results = cur.fetchall()
-
         formatted_results = [
             {
                 "full_name": row[0],
