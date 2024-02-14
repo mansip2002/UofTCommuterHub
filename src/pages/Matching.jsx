@@ -1,8 +1,7 @@
-import { useState,  useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL, START_TIME_OPTIONS } from "../lib/globals";
 import { getStorage } from "../lib/storage";
-import axios from "axios";
 
 const MatchingSystem = () => {
   const navigate = useNavigate();
@@ -13,8 +12,10 @@ const MatchingSystem = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searchErrorMessage, setSearchErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [startLocationSuggestions, setStartLocationSuggestions] = useState([]); 
-  const [endLocationSuggestions, setEndLocationSuggestions] = useState([]); 
+  const [startLocationSuggestions, setStartLocationSuggestions] = useState([]);
+  const [endLocationSuggestions, setEndLocationSuggestions] = useState([]);
+  const [isDisabledStartLocation, setIsDisabledStartLocation] = useState(false);
+  const [isDisabledEndLocation, setIsDisabledEndLocation] = useState(false);
 
   useEffect(() => {
     // Use the effect hook for navigation
@@ -23,16 +24,30 @@ const MatchingSystem = () => {
     }
   }, [navigate]);
 
-  const fetchLocationSuggestions = async (query, setLocationSuggestions) => {
-    try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${query}&bounded=1&viewbox=-141.002622009,41.6751050889,-52.6480987209,83.23324&countrycodes=CA`
-      );
-      setLocationSuggestions(response.data);
-    } catch (error) {
-      console.error("Error fetching location suggestions:", error);
-    }
+  const debounce = (func, timeout = 300) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, timeout);
+    };
   };
+
+  const fetchLocationSuggestions = useCallback(
+    debounce(async (query, setLocationSuggestions) => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${query}&bounded=1&viewbox=-141.002622009,41.6751050889,-52.6480987209,83.23324&countrycodes=CA`
+        );
+        const data = await response.json();
+        setLocationSuggestions(data);
+      } catch (error) {
+        console.error("Error fetching location suggestions:", error);
+      }
+    }, 500),
+    []
+  );
 
   const handleStartLocationChange = (event) => {
     const query = event.target.value;
@@ -63,6 +78,11 @@ const MatchingSystem = () => {
 
     if (!startLocation || !endLocation || !dayOfWeek || !startTime) {
       setSearchErrorMessage("Please fill in all fields before searching.");
+      return;
+    }
+
+    if (!isDisabledEndLocation && !isDisabledStartLocation) {
+      setSearchErrorMessage("Please select at least one campus location.");
       return;
     }
 
@@ -103,7 +123,32 @@ const MatchingSystem = () => {
       <form className="card-form-horizontal">
         {/* Start Location */}
         <div>
-          <label htmlFor="startLocation">Start Location:</label>
+          <div className="d-flex gap-3">
+            <label htmlFor="endLocation">
+              Start<span className="text-danger">*</span>
+            </label>
+
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                id="check-end-campus"
+                onChange={(e) => {
+                  if (e.currentTarget.checked) {
+                    setStartLocation("40 St George St");
+                    setIsDisabledStartLocation(true);
+                  } else {
+                    setStartLocation("");
+                    setIsDisabledStartLocation(false);
+                  }
+                }}
+              />
+              <label className="form-check-label" htmlFor="check-end-campus">
+                Campus
+              </label>
+            </div>
+          </div>
           <input
             type="text"
             id="startLocation"
@@ -111,6 +156,7 @@ const MatchingSystem = () => {
             onChange={handleStartLocationChange}
             placeholder="Start Location"
             className="form-control rounded"
+            disabled={isDisabledStartLocation}
           />
           <div className="suggestions-container">
             <ul className="suggestions-list">
@@ -128,7 +174,32 @@ const MatchingSystem = () => {
 
         {/* End Location */}
         <div>
-          <label htmlFor="endLocation">End Location:</label>
+          <div className="d-flex gap-3">
+            <label htmlFor="endLocation">
+              End<span className="text-danger">*</span>
+            </label>
+
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                id="check-start-campus"
+                onChange={(e) => {
+                  if (e.currentTarget.checked) {
+                    setEndLocation("40 St George St");
+                    setIsDisabledEndLocation(true);
+                  } else {
+                    setEndLocation("");
+                    setIsDisabledEndLocation(false);
+                  }
+                }}
+              />
+              <label className="form-check-label" htmlFor="check-start-campus">
+                Campus
+              </label>
+            </div>
+          </div>
           <input
             type="text"
             id="endLocation"
@@ -136,6 +207,7 @@ const MatchingSystem = () => {
             onChange={handleEndLocationChange}
             placeholder="End Location"
             className="form-control rounded"
+            disabled={isDisabledEndLocation}
           />
           <div className="suggestions-container">
             <ul className="suggestions-list">
