@@ -280,8 +280,15 @@ def search():
         return jsonify({'error': 'Please provide all required parameters'}), 400
 
     try:
+        def is_campus_address(addr: str):
+            addr = addr.lower()
+            if "st george st" in addr and "40" in addr:
+                return True
+            return False
+
         # Convert home location to geography type
-        home_location = start_location if end_location == "40 St George St" else end_location
+        home_location = start_location if is_campus_address(end_location) else end_location
+        home_location = ','.join(home_location.split(',')[:3])
         home_location_coords = geocode_address_osm(home_location)
         cur = create_cursor()
 
