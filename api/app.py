@@ -288,12 +288,9 @@ def search():
 
         # Convert home location to geography type
         home_location = start_location if is_campus_address(end_location) else end_location
-        home_location = home_location.split("—")[0]
+        home_location = ','.join(home_location.split(',')[:3])
         home_location_coords = geocode_address_osm(home_location)
         cur = create_cursor()
-
-        print_error(home_location);
-        print_error(home_location_coords);
 
         query = """--sql
             SELECT full_name, start_location, end_location, day_of_week, start_time, email 
