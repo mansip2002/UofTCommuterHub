@@ -232,6 +232,8 @@ def test_top5_accuracy(client):
     assert avg3 < avg4
     assert avg4 < avg5
 
+    assert response.status_code == 200
+
 def test_function():
     print("Testing pytest")
     assert True
