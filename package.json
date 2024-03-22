@@ -15,6 +15,7 @@
     "preinstall": "pip install -r ./api/requirements.txt"
   },
   "dependencies": {
+    "@cypress/react18": "^2.0.0",
     "bootstrap": "^5.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -23,15 +24,19 @@
     "styled-components": "^6.1.1"
   },
   "devDependencies": {
+    "@cypress/react": "^8.0.0",
+    "@cypress/webpack-dev-server": "^3.7.4",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.2.1",
     "concurrently": "^8.2.2",
+    "cypress": "^13.6.4",
     "eslint": "^8.53.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "senv": "^1.0.2",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "webpack": "^5.90.1"
   }
 }
