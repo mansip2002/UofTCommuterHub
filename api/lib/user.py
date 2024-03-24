@@ -82,3 +82,41 @@ def authenticate(account: User, password: str):
     password_hash = hash_password(password, account['salt'])
 
     return password_hash == account['password_hash']
+
+def update_user_verification_code(id: str, verification_code: str) -> User:
+    cursor = create_cursor()
+
+    cursor.execute(
+        """--sql
+            UPDATE user_profile 
+            SET verification_code = %s
+            WHERE id = %s
+            RETURNING *
+        """, 
+        (verification_code, id)
+    )
+
+    account = cursor.fetchone()
+
+    commit_to_db()
+    cursor.close()
+
+    return serialize_user(account)
+
+def update_user_password(email: str, new_password: str) -> None:
+    cursor = create_cursor()
+
+    salt = generate_random_salt()
+    password_hash = hash_password(new_password, salt)
+
+    cursor.execute(
+        """--sql
+            UPDATE user_profile 
+            SET password_hash = %s, salt = %s
+            WHERE email = %s
+        """, 
+        (password_hash, salt, email)
+    )
+
+    commit_to_db()
+    cursor.close()
