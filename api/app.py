@@ -55,8 +55,8 @@ def register_user():
         if not password:
             return jsonify({'message': 'Password is required.'}), 400
         
-        # if not email.endswith('utoronto.ca'):
-        #     return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
+        if not email.endswith('utoronto.ca'):
+            return jsonify({'message': 'You need a UofT (utoronto.ca) email to register.'}), 400
 
         if get_user(email=email):
             return jsonify({'message': 'Email already registered.'}), 400
@@ -98,15 +98,15 @@ def login():
             return jsonify({'message': 'Password is required.'}), 400
         
         if not user:
-            return jsonify({'message': f'User for email {email} not found.'}), 404
+            return jsonify({'message': f'Email {email} is not registered. Please Sign Up.'}), 404
 
         if not user['verified']:
-            return jsonify({'message': f'User for email {email} not verified.'}), 401
+            return jsonify({'message': f'Email {email} is not verified. Please verify your email.'}), 401
         
         is_correct_password = authenticate(user, password)
 
         if not is_correct_password:
-            return jsonify({'message': 'Unauthorized.'}), 401
+            return jsonify({'message': 'Incorrect password.'}), 401
 
         token = encode_token(email)
 

@@ -40,18 +40,19 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw Error(`Fetch failed with status ${response.status}`);
+        throw Error(data.message || `Fetch failed with status ${response.status}`);
       }
 
-      const data = await response.json();
 
       setStorage("capstone-token", data.token);
 
       navigate(`/manage-commutes`);
     } catch (e) {
       console.error(e);
-      setError("There was an error signing you up. Please try again later.");
+      setError(e.message || "There was an error Logging in. Please try again later.");
     }
 
     setIsLoading(false);
@@ -100,6 +101,12 @@ const Login = () => {
           <div className="d-flex justify-content-center">
             <p>
               Don't have an account? <Link to="/signup">Sign Up</Link>
+            </p>
+          </div>
+
+          <div className="d-flex justify-content-center">
+            <p>
+              Forgot Password? <Link to="/reset-password">Reset Password</Link>
             </p>
           </div>
 

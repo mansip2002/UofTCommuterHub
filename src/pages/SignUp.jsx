@@ -35,7 +35,7 @@ const Signup = () => {
       setMessage(data.message);
 
       if (!response.ok) {
-        throw Error(`Fetch failed with status ${response.status}`);
+        throw Error(data.message || `Fetch failed with status ${response.status}`);
       }
 
       if (response.status === 200) {
@@ -43,7 +43,7 @@ const Signup = () => {
       }
     } catch (e) {
       console.error(e);
-      setError("There was an error signing you up. Please try again later.");
+      setError(e.message || "There was an error signing you up. Please try again later.");
     }
 
     setIsLoading(false);
@@ -113,7 +113,6 @@ const Signup = () => {
               Sign Up
             </button>
           </div>
-          {message && <div className="message">{message}</div>}
           <div className="d-flex justify-content-center">
             <p>
               Already have an account? <Link to="/login">Login</Link>
