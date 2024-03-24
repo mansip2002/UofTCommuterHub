@@ -5,6 +5,8 @@ import Login from "./pages/Login";
 import Verify from "./pages/Verify";
 import SignUp from "./pages/SignUp";
 import SignOut from "./pages/SignOut";
+import ResetPassword from "./pages/ResetPassword";
+import ResetPasswordVerify from "./pages/ResetPasswordVerify";
 import MatchingSystem from "./pages/Matching";
 import Resources from "./pages/Resources";
 import { ToastProvider } from "./lib/toast";
@@ -30,6 +32,8 @@ function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/sign-out" element={<SignOut />} />
             <Route path="/verify" element={<Verify />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password-verify" element={<ResetPasswordVerify />} />
           </Routes>
         </main>
       </BrowserRouter>

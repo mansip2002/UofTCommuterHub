@@ -2,7 +2,7 @@ from sys import stderr
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from flask_cors import CORS
-from lib.user import get_user, create_user, set_user_verified, authenticate
+from lib.user import get_user, create_user, set_user_verified, authenticate, update_user_password, update_user_verification_code
 from lib.globals import env, commit_to_db, create_cursor
 from lib.auth import encode_token
 from lib.auth import decode_token
@@ -136,6 +136,64 @@ def verify_email():
             return jsonify({'message': 'Invalid verification code.'}), 400
     except Exception as e:
         print_error(e, "/verify")
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    try:
+        data = request.get_json()
+
+        email = data.get('email')
+
+        if not email:
+            return jsonify({'message': 'Email is required.'}), 400
+
+        user = get_user(email=email)
+
+        if not user:
+            return jsonify({'message': f'User for email {email} not found.'}), 404
+
+        verification_code = generate_verification_code()
+        user['verification_code'] = verification_code  
+
+        update_user_verification_code(user['id'], verification_code)
+
+        msg = Message(
+            'Password Reset Verification',
+            sender='uoftcommuterhub@gmail.com',
+            recipients=[email],
+            body=f'Please click on this link to reset your password: {env["BASE_URL"]}/reset-password-verify?email={quote(email)}&code={verification_code}'
+        )
+
+        mail.send(msg)
+
+        return jsonify({'message': 'Password reset instructions sent to your email.'})
+    except Exception as e:
+        print_error(e, "/reset-password")
+        return jsonify({"error": "There was an error."}), 500
+    
+@app.route('/reset-password/verify', methods=['POST'])
+def verify_reset_password():
+    try:
+        data = request.get_json()
+
+        email = data.get('email')
+        code = data.get('code')
+        new_password = data.get('password')
+
+        user = get_user(email=email)
+
+        if not user:
+            return jsonify({'message': f'User for email {email} not found.'}), 404
+
+        if user['verification_code'] != code:
+            return jsonify({'message': 'Invalid verification code.'}), 400
+
+        update_user_password(email, new_password)
+
+        return jsonify({'message': 'Password reset successful.'})
+    except Exception as e:
+        print_error(e, "/reset-password/verify")
         return jsonify({"error": str(e)}), 500
     
 # Get user profile
