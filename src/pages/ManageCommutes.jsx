@@ -228,7 +228,7 @@ const ManageCommutes = () => {
             value={startLocation}
             onChange={handleStartLocationChange}
             placeholder="Start Location"
-            className="form-control rounded"
+            className="form-control rounded responsive-input"
             disabled={isDisabledStartLocation}
           />
           <div className="suggestions-container">
@@ -279,7 +279,7 @@ const ManageCommutes = () => {
             value={endLocation}
             onChange={handleEndLocationChange}
             placeholder="End Location"
-            className="form-control rounded"
+            className="form-control rounded responsive-input"
             disabled={isDisabledEndLocation}
           />
 
@@ -370,41 +370,43 @@ const ManageCommutes = () => {
       {message && <div className="text-success">{message}</div>}
 
       {/* Existing Commutes */}
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">Day</th>
-            <th scope="col">Start Location</th>
-            <th scope="col">End Location</th>
-            <th scope="col">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {!isLoading && commutes.length > 0 ? (
-            commutes.map((result, i) => (
-              <tr key={i}>
-                <td>{result.day_of_week}</td>
-                <td>{result.start_location}</td>
-                <td>{result.end_location}</td>
-                <td>{result.start_time}</td>
-              </tr>
-            ))
-          ) : (
+      <div className="table-responsive">
+        <table className="table">
+          <thead>
             <tr>
-              <td
-                colSpan={6}
-                style={{ textAlign: "center", padding: "1rem 0" }}
-              >
-                {isLoading ? (
-                  <div className="spinner-border" role="status"></div>
-                ) : (
-                  "No commutes added yet. Add a commute above to get started."
-                )}
-              </td>
+              <th scope="col">Day</th>
+              <th scope="col">Start Location</th>
+              <th scope="col">End Location</th>
+              <th scope="col">Time</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {!isLoading && commutes.length > 0 ? (
+              commutes.map((result, i) => (
+                <tr key={i}>
+                  <td>{result.day_of_week}</td>
+                  <td>{result.start_location}</td>
+                  <td>{result.end_location}</td>
+                  <td>{result.start_time}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{ textAlign: "center", padding: "1rem 0" }}
+                >
+                  {isLoading ? (
+                    <div className="spinner-border" role="status"></div>
+                  ) : (
+                    "No commutes added yet. Add a commute above to get started."
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

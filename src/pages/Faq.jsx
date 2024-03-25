@@ -25,7 +25,7 @@ const Faq = () => {
         <h4>How do I find a match?</h4>
         <div>
           UofT Commuter Hub uses your travel details (see{" "}
-          <Link to="/my-commutes">My Commutes</Link>) to find a match. You can
+          <Link to="/manage-commutes">My Commutes</Link>) to find a match. You can
           also search for matches using the <Link to="/matching">Matching</Link>{" "}
           page.
         </div>

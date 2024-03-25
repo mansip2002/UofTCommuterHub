@@ -275,48 +275,50 @@ const MatchingSystem = () => {
 
         <br />
       </form>
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Day</th>
-            <th scope="col">Leave Time</th>
-            <th scope="col">Start Location</th>
-            <th scope="col">End Location</th>
-          </tr>
-        </thead>
-        <tbody>
-          {!isLoading && searchResults.length > 0 ? (
-            searchResults.map((result, i) => (
-              <tr key={i}>
-                <td>{result.full_name}</td>
-                <td>
-                  <a href={`mailto:${result.email}`}>{result.email}</a>
-                </td>
-                <td>{result.day_of_week}</td>
-                <td>{result.start_time}</td>
-                <td>{result.start_location}</td>
-                <td>{result.end_location}</td>
-              </tr>
-            ))
-          ) : (
+      
+      <div className="table-responsive">
+        <table className="table">
+          <thead>
             <tr>
-              <td
-                colSpan={6}
-                style={{ textAlign: "center", padding: "1rem 0" }}
-              >
-                {isLoading ? (
-                  <div className="spinner-border" role="status"></div>
-                ) : (
-                  "Adjust the search criteria to find a match."
-                )}
-              </td>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Day</th>
+              <th scope="col">Leave Time</th>
+              <th scope="col">Start Location</th>
+              <th scope="col">End Location</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {!isLoading && searchResults.length > 0 ? (
+              searchResults.map((result, i) => (
+                <tr key={i}>
+                  <td>{result.full_name}</td>
+                  <td>
+                    <a href={`mailto:${result.email}`}>{result.email}</a>
+                  </td>
+                  <td>{result.day_of_week}</td>
+                  <td>{result.start_time}</td>
+                  <td>{result.start_location}</td>
+                  <td>{result.end_location}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{ textAlign: "center", padding: "1rem 0" }}
+                >
+                  {isLoading ? (
+                    <div className="spinner-border" role="status"></div>
+                  ) : (
+                    "Adjust the search criteria to find a match."
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
