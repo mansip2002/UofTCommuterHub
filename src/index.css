@@ -10,4 +10,11 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+  font-size: 0.9em;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; 
+  }
 }
